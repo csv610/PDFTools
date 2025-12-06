@@ -8,9 +8,9 @@ from unittest.mock import Mock, patch, MagicMock
 from io import StringIO
 
 # Add pdftools to path
-sys.path.insert(0, str(Path(__file__).parent.parent / "pdftools"))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from pdftext_utils import (
+from pdftools.pdftext_utils import (
     clean_page_text,
     remove_references,
     calculate_page_position,
@@ -19,7 +19,7 @@ from pdftext_utils import (
     get_cli_parser,
     extract_and_clean,
 )
-from discard_tracker import DiscardTracker, DiscardType
+from pdftools.discard_tracker import DiscardTracker, DiscardType
 
 
 class TestCleanPageText:
@@ -437,7 +437,7 @@ class TestExtractAndClean:
 
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', return_value=mock_reader):
+        with patch('pdftools.pdftext_utils.PdfReader', return_value=mock_reader):
             # Create a temporary PDF file path (won't actually be read due to mock)
             pdf_path = str(tmp_path / "test.pdf")
             text, boundaries = extract_and_clean(pdf_path, tracker)
@@ -463,7 +463,7 @@ class TestExtractAndClean:
 
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', return_value=mock_reader):
+        with patch('pdftools.pdftext_utils.PdfReader', return_value=mock_reader):
             pdf_path = str(tmp_path / "test.pdf")
             text, boundaries = extract_and_clean(pdf_path, tracker)
 
@@ -492,7 +492,7 @@ class TestExtractAndClean:
 
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', return_value=mock_reader):
+        with patch('pdftools.pdftext_utils.PdfReader', return_value=mock_reader):
             pdf_path = str(tmp_path / "test.pdf")
             text, boundaries = extract_and_clean(pdf_path, tracker)
 
@@ -512,7 +512,7 @@ class TestExtractAndClean:
 
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', return_value=mock_reader):
+        with patch('pdftools.pdftext_utils.PdfReader', return_value=mock_reader):
             pdf_path = str(tmp_path / "test.pdf")
             text, boundaries = extract_and_clean(pdf_path, tracker)
 
@@ -533,7 +533,7 @@ class TestExtractAndClean:
 
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', return_value=mock_reader):
+        with patch('pdftools.pdftext_utils.PdfReader', return_value=mock_reader):
             pdf_path = str(tmp_path / "test.pdf")
             text, boundaries = extract_and_clean(pdf_path, tracker)
 
@@ -561,7 +561,7 @@ class TestExtractAndClean:
 
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', return_value=mock_reader):
+        with patch('pdftools.pdftext_utils.PdfReader', return_value=mock_reader):
             pdf_path = str(tmp_path / "test.pdf")
             text, boundaries = extract_and_clean(pdf_path, tracker)
 
@@ -581,7 +581,7 @@ class TestExtractAndClean:
 
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', return_value=mock_reader):
+        with patch('pdftools.pdftext_utils.PdfReader', return_value=mock_reader):
             pdf_path = str(tmp_path / "test.pdf")
             text, boundaries = extract_and_clean(pdf_path, tracker)
 
@@ -602,7 +602,7 @@ class TestExtractAndClean:
 
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', return_value=mock_reader):
+        with patch('pdftools.pdftext_utils.PdfReader', return_value=mock_reader):
             pdf_path = str(tmp_path / "test.pdf")
             text, boundaries = extract_and_clean(pdf_path, tracker)
 
@@ -621,7 +621,7 @@ class TestExtractAndClean:
 
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', return_value=mock_reader):
+        with patch('pdftools.pdftext_utils.PdfReader', return_value=mock_reader):
             pdf_path = str(tmp_path / "test.pdf")
             text, boundaries = extract_and_clean(pdf_path, tracker)
 
@@ -635,7 +635,7 @@ class TestExtractAndClean:
         pdf_path = str(tmp_path / "nonexistent.pdf")
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', side_effect=FileNotFoundError):
+        with patch('pdftools.pdftext_utils.PdfReader', side_effect=FileNotFoundError):
             with pytest.raises(FileNotFoundError):
                 extract_and_clean(pdf_path, tracker)
 
@@ -676,7 +676,7 @@ class TestIntegration:
 
         tracker = DiscardTracker()
 
-        with patch('pdftext_utils.PdfReader', return_value=mock_reader):
+        with patch('pdftools.pdftext_utils.PdfReader', return_value=mock_reader):
             pdf_path = str(tmp_path / "test.pdf")
             text, boundaries = extract_and_clean(pdf_path, tracker)
 
