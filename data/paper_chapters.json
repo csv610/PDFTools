@@ -1,0 +1,12 @@
+{
+  "pdf_file": "/Users/csv610/Projects/PDFTools/data/paper.pdf",
+  "total_pages": 15,
+  "chapters": [
+    {
+      "id": 1,
+      "title": "Full Document",
+      "start_page": 1,
+      "end_page": 15
+    }
+  ]
+}

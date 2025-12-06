@@ -1,0 +1,12 @@
+{
+  "pdf_file": "/Users/csv610/Projects/PDFTools/data/536.pdf",
+  "total_pages": 442,
+  "chapters": [
+    {
+      "id": 1,
+      "title": "Full Document",
+      "start_page": 1,
+      "end_page": 442
+    }
+  ]
+}
