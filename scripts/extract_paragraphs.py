@@ -4,6 +4,12 @@ Extract paragraphs from PDF with detailed discard tracking.
 Tracks and documents what content is removed during extraction process.
 """
 
+import sys
+from pathlib import Path
+
+# Add src directory to path
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+
 import re
 from discard_tracker import DiscardTracker
 from pdftext_utils import (
