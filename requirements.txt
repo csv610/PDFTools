@@ -1,6 +1,6 @@
 # PDF Tools Requirements
 # Core PDF processing libraries
-PyPDF2==4.3.1
+PyPDF2==3.0.1
 pypdf==6.3.0
 
 # Image conversion and processing
@@ -9,3 +9,6 @@ Pillow==11.0.0
 
 # Optional but recommended
 python-dotenv==1.0.1
+
+# Testing
+pytest==7.4.3

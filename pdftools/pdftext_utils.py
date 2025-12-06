@@ -57,11 +57,12 @@ def clean_page_text(text: str, page_num: int, tracker: DiscardTracker) -> str:
     for line in lines:
         line_num += 1
         stripped = line.strip()
-        tracker.total_lines_processed += 1
 
         # Skip empty lines (don't track)
         if not stripped:
             continue
+
+        tracker.total_lines_processed += 1
 
         # Check page numbers
         if re.match(r'^\d{1,3}$', stripped):

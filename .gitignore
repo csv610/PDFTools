@@ -130,7 +130,74 @@ dmypy.json
 *~
 .DS_Store
 
-# Project-specific
+# Project-specific - PDFTools
 *.pdf
 output/
 results/
+extracted_*.txt
+discard_tracking.txt
+*.log
+extract_chapters.log
+
+# Virtual environment
+pdfenv/
+venv/
+.venv/
+
+# IDE and Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# OS specific
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
+
+# Test and Coverage
+.coverage/
+htmlcov/
+.pytest_cache/
+*.cover
+coverage.xml
+test-results/
+
+# Build and Distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+*.whl
+
+# Documentation
+site/
+docs/_build/
+.htmldoc/
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+.~*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+secrets.txt
+
+# Cache directories
+__pycache__/
+.cache/
+.ruff_cache/
+
+# Runtime
+data/extracted/
+data/processed/
+data/output/
