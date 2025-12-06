@@ -24,7 +24,7 @@ for category, versions in extraction_tools.items():
     print(f"\n{category}")
     print("-" * 100)
     
-    for version_name, (filename, description) in versions.items():
+    for _, (filename, description) in versions.items():
         if os.path.exists(filename):
             size = os.path.getsize(filename) / 1024  # KB
             with open(filename, 'r') as f:

@@ -1,7 +1,7 @@
 import streamlit as st
 import fitz
 from dataclasses import dataclass
-from typing import Optional, List, Set, Tuple, BinaryIO
+from typing import List, Tuple, BinaryIO
 import logging
 from pathlib import Path
 

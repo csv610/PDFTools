@@ -385,7 +385,8 @@ class BookChaptersExtractor:
                         title = match.group(3).strip()
 
                         # If title is incomplete (ends abruptly), get next line
-                        if not title or (i + 1 < len(lines) and not lines[i + 1].strip()[0].isdigit()):
+                        next_line_stripped = lines[i + 1].strip() if i + 1 < len(lines) else ""
+                        if not title or (next_line_stripped and not next_line_stripped[0].isdigit()):
                             # Next line might be continuation of title
                             if i + 1 < len(lines):
                                 next_line = lines[i + 1].strip()
