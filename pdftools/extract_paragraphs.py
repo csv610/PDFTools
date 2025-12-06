@@ -5,8 +5,8 @@ Tracks and documents what content is removed during extraction process.
 """
 
 import re
-from discard_tracker import DiscardTracker
-from pdftext_utils import (
+from pdftools.discard_tracker import DiscardTracker
+from pdftools.pdftext_utils import (
     extract_and_clean, calculate_page_position, save_content_to_file,
     display_table, get_cli_parser
 )

@@ -7,7 +7,7 @@ Provides common functions for cleaning PDF text and tracking discarded content.
 import argparse
 import re
 from pypdf import PdfReader
-from discard_tracker import DiscardTracker, DiscardType
+from pdftools.discard_tracker import DiscardTracker, DiscardType
 
 
 def extract_and_clean(pdf_path: str, tracker: DiscardTracker) -> tuple[str, list]:

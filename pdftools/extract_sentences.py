@@ -6,8 +6,8 @@ to document what content was removed during processing.
 """
 
 import re
-from discard_tracker import DiscardTracker, DiscardType
-from pdftext_utils import (
+from pdftools.discard_tracker import DiscardTracker, DiscardType
+from pdftools.pdftext_utils import (
     extract_and_clean, calculate_page_position, save_content_to_file,
     display_table, get_cli_parser
 )
