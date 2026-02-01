@@ -2,6 +2,7 @@
 # Core PDF processing libraries
 PyPDF2==3.0.1
 pypdf==6.3.0
+tqdm
 
 # Image conversion and processing
 pdf2image==1.17.0
