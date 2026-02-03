@@ -17,7 +17,7 @@ class PDF2ImageConverter:
         self.page_count: int | None = None
         self.image_paths: List[str] = []
 
-    def process_pdf(self, input_file: str, output_directory: str = "images", dpi: int = 300, chunk_size: int = 5) -> List[str]:
+    def process_pdf(self, input_file: str, output_directory: str = "images", dpi: int = 400, chunk_size: int = 5) -> List[str]:
         """Process the PDF file: create output directory, get page count, and convert to images.
         
         Args:
