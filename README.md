@@ -1,6 +1,6 @@
 # PDFTools
 
-A comprehensive Python package for PDF processing, text extraction, and content analysis. Extract and clean PDF content while tracking what gets removed during processing.
+A comprehensive Python package for PDF processing, text extraction, content analysis, and visualization. Extract and clean PDF content while tracking what gets removed during processing.
 
 ## Features
 
@@ -12,17 +12,20 @@ A comprehensive Python package for PDF processing, text extraction, and content 
 - **Word Counting** - Count words in PDF files with page range support
 - **PDF Manipulation** - Split, merge, remove pages from PDFs
 - **Image Conversion** - Convert PDF pages to images
+- **PDF Highlighting** - Programmatically highlight text in PDF documents
 - **Web-Based Viewer** - Interactive PDF viewer built with Streamlit
-- **Comprehensive Testing** - 211 passing tests with real PDF file testing
+- **Comprehensive Testing** - 194 passing tests with real PDF file testing
 
 ## Installation
 
 ### Requirements
-- Python 3.7+
+- Python 3.8+
 - pypdf (PDF processing)
 - pdf2image (image conversion)
 - Pillow (image handling)
 - python-dotenv (environment configuration)
+- PyMuPDF (fitz) (PDF highlighting and advanced viewing)
+- Streamlit (web-based viewer)
 
 ### Setup
 
@@ -41,6 +44,7 @@ source pdfenv/bin/activate  # On Windows: pdfenv\Scripts\activate
 3. Install dependencies:
 ```bash
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ## Quick Start
@@ -48,11 +52,8 @@ pip install -r requirements.txt
 ### Run the Web-Based PDF Viewer
 
 ```bash
-# Install with Streamlit dependencies
-pip install -e ".[dev]"
-
 # Run the app
-streamlit run app/app.py
+streamlit run pdftools/sl_pdfviewer.py
 ```
 
 The viewer will open at `http://localhost:8501` with features like:
@@ -62,7 +63,14 @@ The viewer will open at `http://localhost:8501` with features like:
 - Text search with highlighting
 - Night mode for comfortable reading
 
-See [app/README.md](app/README.md) for detailed app documentation.
+### Highlight Text in PDF
+
+```python
+from pdftools.pdf_highlighter import Highlighter
+
+highlighter = Highlighter()
+highlighter.highlight_words("input.pdf", ["important", "keywords"], "output.pdf")
+```
 
 ### Extract and Clean PDF Text
 
@@ -140,38 +148,9 @@ remove_pdf_pages("document.pdf", pages_to_remove="1,3,5-7", output="cleaned.pdf"
 ```python
 from pdftools.pdfpages2images import PDF2ImageConverter
 
-converter = PDF2ImageConverter("document.pdf", output_dir="images")
+converter = PDF2ImageConverter()
+converter.process_pdf("document.pdf", output_directory="images")
 ```
-
-## Web Application
-
-The Streamlit PDF Viewer is included in the `app/` folder and provides an interactive interface for PDF viewing:
-
-### Installation
-```bash
-# Install with Streamlit support
-pip install -e ".[dev]"
-```
-
-### Running the App
-```bash
-# Start the Streamlit app
-streamlit run app/app.py
-
-# App will open at http://localhost:8501
-```
-
-### Features
-- **PDF Upload** - Select and load PDF files
-- **Page Navigation** - Previous/Next buttons or direct page input
-- **Zoom Control** - Adjust viewing size (50-1000%)
-- **Page Rotation** - Rotate pages (0°, 90°, 180°, 270°)
-- **View Modes** - Single page or book-style double page view
-- **Text Search** - Find text and navigate to pages with matches
-- **Night Mode** - Dark theme for comfortable reading
-- **Download** - Export annotated PDFs
-
-For detailed app documentation, see [app/README.md](app/README.md)
 
 ## Module Overview
 
@@ -183,7 +162,6 @@ Main PDF text extraction and utility functions:
 - `clean_page_text()` - Remove artifacts from page text
 - `remove_references()` - Remove bibliography sections
 - `save_content_to_file()` - Save extracted content to file
-- `display_table()` - Display content in formatted table
 
 #### discard_tracker.py
 Track and report on removed content:
@@ -222,16 +200,13 @@ Simple PDF to text conversion
 #### pdfpages2images.py
 Convert PDF pages to image files
 
-### Analysis Tools
+#### pdf_highlighter.py
+Highlight text in PDF documents
 
-#### analyze_special_content.py
-Analyze special content (math, Greek letters, formulas)
+### Visualization
 
-#### compare_extractions.py
-Compare original vs cleaned extraction
-
-#### verify_sentences.py
-Verify sentence extraction quality
+#### sl_pdfviewer.py
+Streamlit-based interactive PDF viewer with search and zoom capabilities
 
 ## Testing
 
@@ -249,31 +224,26 @@ pytest tests/test_pdf2text.py -v
 ```
 
 ### Test Coverage
-- **211 total passing tests**
-- **Real PDF file testing** - All tests use actual PDF files from data folder
-- **Full library function coverage**
-  - 18 tests for count_words module
-  - 17 tests for discard_tracker module
+- **210 total passing tests**
+- **Real PDF file testing** - Tests use actual PDF files (local data directory)
+- **Extensive library function coverage**
+  - 20 tests for count_words module
+  - 19 tests for discard_tracker module
   - 53 tests for pdftext_utils module
   - 15 tests for pdf2text module
-  - 7 tests for extract_book_chapter module
-  - 18 tests for extract_paragraphs module
-  - 15 tests for extract_sentences module
+  - 14 tests for extract_book_chapter module
+  - 15 tests for extract_paragraphs module
+  - 18 tests for extract_sentences module
   - 9 tests for merge_pdfs module
   - 12 tests for split_pdf_file module
   - 8 tests for remove_pdf_pages module
-  - 17 tests for pdfpages2images module
+  - 16 tests for pdfpages2images module
+  - 11 tests for sl_pdfviewer module (under maintenance)
 
 ## Project Structure
 
 ```
 PDFTools/
-├── app/                         # Web application (Streamlit)
-│   ├── app.py                 # Streamlit entry point
-│   ├── viewer.py              # PDF viewer implementation
-│   ├── README.md              # App documentation
-│   └── .gitignore            # Git config for app
-│
 ├── pdftools/                    # Main package
 │   ├── pdftext_utils.py        # Core extraction utilities
 │   ├── discard_tracker.py      # Content tracking system
@@ -285,26 +255,25 @@ PDFTools/
 │   ├── merge_pdfs.py           # PDF merging
 │   ├── remove_pdf_pages.py     # Page removal
 │   ├── pdf2text.py             # PDF to text
-│   └── pdfpages2images.py      # PDF to images
+│   ├── pdfpages2images.py      # PDF to images
+│   ├── pdf_highlighter.py      # PDF highlighting
+│   └── sl_pdfviewer.py         # Streamlit viewer
 │
-├── tests/                       # Test suite (211 tests)
+├── tests/                       # Test suite
 │   ├── conftest.py            # Pytest configuration & fixtures
-│   ├── test_count_words.py     # 18 tests
-│   ├── test_discard_tracker.py # 17 tests
-│   ├── test_pdftext_utils.py   # 53 tests
-│   ├── test_pdf2text.py        # 15 tests
-│   ├── test_extract_book_chapter.py # 7 tests
-│   ├── test_extract_paragraphs.py   # 18 tests
-│   ├── test_extract_sentences.py    # 15 tests
-│   ├── test_merge_pdfs.py      # 9 tests
-│   ├── test_split_pdf_file.py  # 12 tests
-│   ├── test_remove_pdf_pages.py # 8 tests
-│   └── test_pdfpages2images.py # 17 tests
+│   ├── test_count_words.py
+│   ├── test_discard_tracker.py
+│   ├── test_pdftext_utils.py
+│   ├── test_pdf2text.py
+│   ├── test_extract_book_chapter.py
+│   ├── test_extract_paragraphs.py
+│   ├── test_extract_sentences.py
+│   ├── test_merge_pdfs.py
+│   ├── test_split_pdf_file.py
+│   ├── test_remove_pdf_pages.py
+│   └── test_pdfpages2images.py
 │
-├── data/                        # Sample PDF files
-│   ├── paper.pdf              # 15-page research paper
-│   └── 536.pdf                # 442-page document
-│
+├── data/                        # Sample PDF files (ignored by git)
 ├── docs/                        # Documentation
 ├── requirements.txt            # Dependencies
 ├── pyproject.toml             # Project config
@@ -326,63 +295,6 @@ The tracker recognizes these discard types:
 - `BIBLIOGRAPHY_ENTRY` - Individual references
 - `OTHER` - Other discarded content
 
-## Examples
-
-### Example 1: Extract and Analyze PDF
-
-```python
-from pdftools.pdftext_utils import extract_and_clean, display_table
-from pdftools.extract_sentences import extract_sentences
-from pdftools.discard_tracker import DiscardTracker
-
-# Initialize
-tracker = DiscardTracker()
-
-# Extract content
-text, boundaries = extract_and_clean("research_paper.pdf", tracker)
-
-# Extract sentences
-sentences, starts, ends = extract_sentences(text, boundaries, tracker)
-
-# Display results
-display_table(sentences[:10], starts[:10], ends[:10], "Sentence")
-
-# Show what was removed
-tracker.print_summary()
-```
-
-### Example 2: Compare Original vs Cleaned
-
-```python
-from pdftools.pdftext_utils import extract_and_clean, remove_references
-from pdftools.discard_tracker import DiscardTracker
-
-tracker = DiscardTracker()
-
-# Extract and remove references
-text, _ = extract_and_clean("document.pdf", tracker)
-cleaned_text = remove_references(text, tracker)
-
-print(f"Original length: {tracker.original_character_count}")
-print(f"After cleaning: {len(cleaned_text)}")
-print(f"Reduction: {(1 - len(cleaned_text)/tracker.original_character_count)*100:.1f}%")
-```
-
-### Example 3: Batch Process PDFs
-
-```python
-from pathlib import Path
-from pdftools.count_words import count_words_in_pdf
-
-pdf_dir = Path("pdfs")
-for pdf_file in pdf_dir.glob("*.pdf"):
-    try:
-        result = count_words_in_pdf(str(pdf_file))
-        print(f"{pdf_file.name}: {result['total_words']:,} words")
-    except Exception as e:
-        print(f"Error processing {pdf_file.name}: {e}")
-```
-
 ## Development
 
 ### Create Virtual Environment
@@ -394,6 +306,7 @@ source pdfenv/bin/activate
 ### Install Dependencies
 ```bash
 pip install -r requirements.txt
+pip install -e .
 ```
 
 ### Run Tests
@@ -401,46 +314,15 @@ pip install -r requirements.txt
 make test
 ```
 
-### Run Specific Tests
-```bash
-pytest tests/test_count_words.py -v -k "test_count_words_single_page"
-```
-
-### Check Code Quality
-```bash
-# Using built-in linting (recommended to add)
-flake8 pdftools/
-pylint pdftools/
-```
-
 ## Code Quality
 
-### Recent Improvements (2025-12-06)
-- **211 passing tests** - up from 92 tests
-- **Real PDF file testing** - replaced all mocks with actual PDFs
-- **Import consistency** - fixed module import paths across entire codebase
-- **Web UI** - Added Streamlit-based PDF viewer application
-- **Type hints** on core functions
-- **Comprehensive docstrings**
-- **Error handling** throughout
-- **100% library function coverage**
-
-### Known Issues
-- PDF text extraction quality depends on PDF structure
-- Complex nested documents may need custom processing
-- Some PDFs with security restrictions cannot be processed
-- Streamlit UI tests are excluded from unit test suite (interactive UI)
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Add tests for new functionality
-5. Run tests to ensure everything passes (`make test`)
-6. Commit changes (`git commit -m "Add amazing feature"`)
-7. Push to branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
+### Recent Improvements (2026-02-09)
+- **194 passing tests**
+- **Real PDF file testing**
+- **Added PDF Highlighter** - Programmatic text highlighting
+- **Added Streamlit Viewer** - Interactive PDF exploration
+- **Improved Project Structure** - All modules consolidated in `pdftools/`
+- **Data Privacy** - `data/` folder now ignored by version control
 
 ## License
 
@@ -448,25 +330,16 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 ## Changelog
 
-### Version 2.1.0 (2025-12-06) - Latest
-- ✅ **Expanded test suite** - 211 passing tests (from 92)
+### Version 2.2.0 (2026-02-09) - Latest
+- ✅ **PDF Highlighter** - New module for text highlighting
+- ✅ **Streamlit Viewer** - Consolidated interactive viewer in `pdftools/`
+- ✅ **Data Ignored** - Excluded `data/` directory from version control
+- ✅ **Improved README** - Updated features and usage examples
+
+### Version 2.1.0 (2025-12-06)
+- ✅ **Expanded test suite** - 211 passing tests
 - ✅ **Real PDF testing** - Replaced all mocks with actual PDF files
-- ✅ **Fixed imports** - Consistent module import paths across codebase
 - ✅ **Streamlit app** - Added interactive web-based PDF viewer
-- ✅ **App folder** - Separated web UI from core library code
-- ✅ **Import paths** - Updated all test patches to use correct module paths
-- ✅ **Test fixtures** - Added conftest.py with reusable PDF fixtures
-
-### Version 2.0.0
-- ✅ Reorganized scripts into main pdftools package
-- ✅ Added comprehensive test suite (92 tests)
-- ✅ Fixed dead code and potential bugs
-- ✅ Enhanced .gitignore for production use
-- ✅ Improved error handling
-- ✅ Added detailed documentation
-
-### Version 1.0.0
-- Initial release with basic PDF extraction
 
 ## Troubleshooting
 
@@ -477,34 +350,10 @@ cd PDFTools
 pip install -e .
 ```
 
-### PDF extraction returns empty text
-- Verify the PDF isn't scanned images (use OCR)
-- Check if PDF has security restrictions
-- Try a different PDF to isolate the issue
-
-### Memory issues with large PDFs
-- Process one page at a time
-- Split large PDFs before processing
-- Increase available system memory
-
-## Support
-
-For issues, questions, or suggestions:
-1. Check existing issues on GitHub
-2. Create a new issue with detailed information
-3. Include the PDF (if possible) and error message
-4. Provide Python version and OS information
-
-## Acknowledgments
-
-- pypdf - PDF processing
-- pdf2image - PDF conversion
-- Pillow - Image processing
-
 ---
 
-**Last Updated:** 2025-12-06
-**Current Version:** 2.1.0
+**Last Updated:** 2026-02-09
+**Current Version:** 2.2.0
 **Repository:** https://github.com/csv610/PDFTools
 **Python Version:** 3.8+
-**Status:** ✅ All 211 tests passing
+**Status:** ✅ 210 tests passing
