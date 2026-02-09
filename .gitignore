@@ -198,6 +198,7 @@ __pycache__/
 .ruff_cache/
 
 # Runtime
+data/
 data/extracted/
 data/processed/
 data/output/
