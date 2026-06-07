@@ -100,26 +100,49 @@ def split_pdf(
     except Exception as e:
         raise RuntimeError(f"Failed to split PDF: {e}") from e
 
-def save_split_pdfs(split_pdfs: List[PdfWriter], output_directory: str) -> int:
+def save_split_pdfs(split_pdfs: List[PdfWriter], output_directory: str | None = None, output_file: str | None = None) -> int:
     """
-    Save split PDFs to the output directory.
+    Save split PDFs to the output directory or a single output file.
 
     Args:
         split_pdfs: List of PdfWriter objects to save
-        output_directory: Directory to store the output PDFs
+        output_directory: Directory to store the split PDFs
+        output_file: Path to a single output file (merges all splits if multiple)
 
     Returns:
         Number of PDFs saved
 
     Raises:
-        OSError: If the output directory cannot be created or files cannot be written
-        ValueError: If split_pdfs is empty
+        OSError: If output cannot be written
+        ValueError: If split_pdfs is empty or neither output option is provided
     """
     if not split_pdfs:
         raise ValueError("No PDFs to save")
 
-    output_dir = Path(output_directory)
+    if output_file:
+        output_path = Path(output_file)
+        try:
+            # Create parent directories if they don't exist
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+            
+            # If multiple writers, merge them (though usually split_pdf produces 1 if pps is large)
+            final_writer = PdfWriter()
+            for writer in split_pdfs:
+                for page in writer.pages:
+                    final_writer.add_page(page)
+            
+            with open(output_path, "wb") as outfile:
+                final_writer.write(outfile)
+            logger.info(f"Created: {output_path}")
+            return 1
+        except Exception as e:
+            logger.error(f"Failed to write {output_path}: {e}")
+            raise OSError(f"Failed to write PDF file '{output_path}': {e}") from e
 
+    if not output_directory:
+        raise ValueError("Either output_directory or output_file must be provided")
+
+    output_dir = Path(output_directory)
     try:
         output_dir.mkdir(parents=True, exist_ok=True)
     except Exception as e:
@@ -127,16 +150,15 @@ def save_split_pdfs(split_pdfs: List[PdfWriter], output_directory: str) -> int:
 
     saved_count = 0
     for index, output_pdf in enumerate(split_pdfs, start=1):
-        output_file = output_dir / f"split_{index:03d}.pdf"
-
+        file_path = output_dir / f"split_{index:03d}.pdf"
         try:
-            with open(output_file, "wb") as outfile:
+            with open(file_path, "wb") as outfile:
                 output_pdf.write(outfile)
-            logger.info(f"Created: {output_file}")
+            logger.info(f"Created: {file_path}")
             saved_count += 1
         except Exception as e:
-            logger.error(f"Failed to write {output_file}: {e}")
-            raise OSError(f"Failed to write PDF file '{output_file}': {e}") from e
+            logger.error(f"Failed to write {file_path}: {e}")
+            raise OSError(f"Failed to write PDF file '{file_path}': {e}") from e
 
     logger.info(f"Successfully saved {saved_count} PDF files")
     return saved_count
@@ -144,11 +166,11 @@ def save_split_pdfs(split_pdfs: List[PdfWriter], output_directory: str) -> int:
 def main_split_pdf() -> None:
     """Main entry point for the PDF splitting tool."""
     parser = argparse.ArgumentParser(
-        description="Split a PDF file into multiple smaller PDFs.",
+        description="Split a PDF file into multiple smaller PDFs or extract a range.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="Examples:\n"
-               "  python split_pdf_file.py -i document.pdf\n"
-               "  python split_pdf_file.py -i document.pdf -p 5 -d output/",
+               "  python split_pdf_file.py -i document.pdf -od splits/\n"
+               "  python split_pdf_file.py -i document.pdf -s 22 -e 34 -of chapter1.pdf\n",
     )
     parser.add_argument(
         "--input_file",
@@ -158,18 +180,23 @@ def main_split_pdf() -> None:
         help="Path to the input PDF file (required)",
     )
     parser.add_argument(
-        "--output_directory",
-        "-d",
+        "--output_file",
+        "-of",
         type=str,
-        default="splits",
-        help="Directory to store the split PDF files (default: 'splits')",
+        help="Path to a single output PDF file",
+    )
+    parser.add_argument(
+        "--output_directory",
+        "-od",
+        type=str,
+        help="Directory to store the split PDF files",
     )
     parser.add_argument(
         "--pages_per_split",
         "-p",
         type=int,
-        default=10,
-        help="Number of pages per split (default: 10)",
+        default=None,
+        help="Number of pages per split (default: entire range if -of used, else 10)",
     )
     parser.add_argument(
         "--start_page",
@@ -201,11 +228,28 @@ def main_split_pdf() -> None:
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
 
+    if not args.output_file and not args.output_directory:
+        logger.error("Error: You must specify either --output_file (-of) or --output_directory (-od)")
+        exit(1)
+
     try:
-        logger.info("Starting PDF split process")
+        logger.info("Starting PDF process")
         logger.info(f"Input file: {args.input_file}")
-        logger.info(f"Output directory: {args.output_directory}")
-        logger.info(f"Pages per split: {args.pages_per_split}")
+        
+        # If output_file is specified, default to one big chunk unless pps is set
+        pps = args.pages_per_split
+        if pps is None:
+            if args.output_file:
+                pps = 1000000  # Effectively no split
+            else:
+                pps = 10
+        
+        if args.output_file:
+            logger.info(f"Output file: {args.output_file}")
+        if args.output_directory:
+            logger.info(f"Output directory: {args.output_directory}")
+            logger.info(f"Pages per split: {pps}")
+
         if args.start_page != 1 or args.end_page is not None:
             logger.info(
                 f"Page range: {args.start_page}-{args.end_page if args.end_page else 'end'}"
@@ -213,13 +257,17 @@ def main_split_pdf() -> None:
 
         split_pdfs = split_pdf(
             args.input_file,
-            args.pages_per_split,
+            pps,
             start_page=args.start_page,
             end_page=args.end_page,
         )
-        saved_count = save_split_pdfs(split_pdfs, args.output_directory)
+        saved_count = save_split_pdfs(
+            split_pdfs, 
+            output_directory=args.output_directory, 
+            output_file=args.output_file
+        )
 
-        logger.info(f"PDF splitting completed successfully! {saved_count} files created.")
+        logger.info(f"PDF process completed successfully! {saved_count} file(s) created.")
     except FileNotFoundError as e:
         logger.error(f"File not found: {e}")
         exit(1)
